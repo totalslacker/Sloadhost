@@ -1,0 +1,107 @@
+Usage instructions for sloadhost-stm32
+
+sloadhost-stm32 version 0.14 (C) Alex Faveluke 2009, 2011
+serial.c dtr/rts code (C) Marten Petschke 2011
+
+Host side downloader for STM32 USART bootloader protocol
+downloadable file format is straight binary
+
+------------------------WARNING--WARNING--WARNING--------------------------
+This software is Alpha.
+"Go" option is not currently working.  
+---------------------------------------------------------------------------
+
+sloadhost is completely controlled using command line options and arguments.  
+There are no configuration files. 
+
+If there are defaults, they can't be counted on.
+
+You need to specify the serial device used, and 
+should specify baudrate: For example:
+
+sloadhost-stm32 --serialdev /dev/ttyUSB1 --baudrate 57600 --get
+
+will run STM's "get" command, displaying the result on stdout.
+
+
+==============================================================
+  Note:  all numerical parameters are interpreted in decimal
+            unless the base code is preappended.
+ 	example:  "11" means eleven.  "0x11" means seventeen.
+==============================================================
+
+
+options:
+--go <address> ...................jump to address and run
+--globalerase    .................globalerase target memory
+--pageserase <pagelist> ...........erase one or more pages
+  List is comma delimited, no spaces.  example:  --pageserase 0x01,0x02,0x03 
+
+--write <address>  ...............write data starting at <address> 
+  (--write requires the --loadfile option to be set)
+
+--read  <address> ................read target memory
+  (--read requires the --savefile option to be set)
+
+--setwriteprotect <sectorlist> ...set write protection
+  on 1 or more sectors.  List is comma delimited, no spaces.
+
+--clearwriteprotect ..............clear write protection on memory
+--setreadprotect .................set read protection on target memory
+--clearreadprotect ...............clear read protection on memory
+--get .....................get target version and allowed commands
+--getversion ..............get target version and read protection status
+--getid ..........................get the chip ID
+--skipautobaud ...................do not send the autobaud sequence
+--dtrrtsconfigboot ...............config bootmode, reset with dtr and rts
+
+--loadfile <loadfilename>  ........set file to load <loadfilename>
+--savefile <savefilename>  ........set file to save <savefilename>
+
+--bytestoread <numberofbytes> .....number of bytes to read
+--serialdev <serialportname> ......set serial port device to <serialportname>
+--baudrate <baudrate> .............set baud rate to <baudrate>
+--version  ........................report the sloadhost version
+---------------------------------------------------------------------
+
+
+the --dtrrtsconfigboot option uses the DTR and RTS lines to control a 
+boot pin and the reset line.   It is intended to be used as such:
+
+
+RS232-DTR ----\/\/\------------------/\/\/---  uC_BOOT0
+             1.8k resistor     |
+                            [clamp]
+                               |
+
+
+RS232-RTS  ----------[ RS232 to TTL  ]-------- uC_RESET
+					 [ like MAX232   ]
+
+
+Both DTR and RTS need to be shifted or clamped to uC voltages (usually 3.3V, 0)
+The DTR line needs to not be inverted.
+The RTS line does need to be inverted
+
+For DTR my test setup uses a 1.8k resistor from the DTR line to a clamp made from a 1n914 diode to 3.3V and a 1n914 diode to digital ground.
+This limits the voltage to about 3.8 high or -.5 low.
+
+When given the --dtrrtsconfig boot option, and hooked up like above,
+sloadhost-stm32 does this:
+
+1.  pulls BOOT0 high
+2.  small delay
+3.  pulls reset low
+4.  small delay   (now the uC should be configured for bootloader on the uart)
+5.  requested programming or reading task
+6.  small delay
+7.  pulls BOOT0 low
+8.  small delay
+8.  pulls reset low
+9.  small delay
+10.  pulls reset high
+11.  small delay
+Now the board should have seen normal reset and jumps to 0x08000000
+
+The general scheme was first implemented in this code by Marten Petchske
+also see http://www.firefly-power.de/STM32 and http://www.er-forum.de

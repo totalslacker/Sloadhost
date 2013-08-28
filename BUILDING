@@ -1,0 +1,45 @@
+Sloadhost v0.14
+
+This is Free Software under the GPL v3, see file COPYING for complete details.
+
+host = the computer sloadhost is running on.
+target = the bootloader in the microcontroller sloadhost talks to.
+
+build instructions:
+
+tar -xvzf sloadhost-0.14.tar.gz
+cd Sloadhost
+cd Common
+for Linux:  
+	cp hostsystemlinux.h hostsystem.h
+for Windows: 
+	cp hostsystemwindows.h hostsystem.h 
+cd ..
+make
+
+The code for specific bootloader targets is in the Protocols directory.  
+Compiled executables from these are all put into the Bin directory.  
+The naming convention for executables is:
+sloadhost-targetname
+like:  sloadhost-stm32
+
+A completely separate, single executable is built for each target architecture.
+
+There's no "make install" yet.. You can put the executables, or links to them,
+wherever you like. 
+ 
+The code that handles the host serial port is in the "Common" directory.
+
+Build is currently switched between Linux or Windows by editing the file
+Common/hostsystem.h.  You can change the desired host by changing into the "Common" directory and:
+for Linux:  cp hostsystemlinux.h hostsystem.h
+for Windows: cp hostsystemwindows.h hostsystem.h 
+
+Windows code is working, but isn't as tested as the Linux side.
+My environment on Windows is mingw: gcc 3.4.2 (mingw-special)
+It may be rather old. 
+My Windows is Windows XP Home Edition, v2002, SP2.
+
+STM32 is the only supported protocol in this version.
+
+

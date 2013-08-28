@@ -1,0 +1,47 @@
+
+For debugging serial issues, it may be helpful to define "COPYTOSERIALVIEWFIFOS"in serial.c (in the "Common" directory)
+
+These will send a copy of everything read an written to serialincopyfifo
+and serialoutcopyfifo.  You can pipe these thru a byte display utility 
+to show what's actually going on on the port:
+
+cat serialoutcopyfifo | ./byterx
+
+Note that an open() call on a fifo blocks until it's opened on the other side.
+
+
+This program also contains an option to completely ignore the serial port and 
+communicate with testing fifos... this was helpful to start implementing
+the protocol.
+To use the local testing fifos, define USELOCALTESTINGFIFOS in serial.c
+
+output and input here are defined as host to target...
+serial output is what the big computer sends down to the target uC
+
+The serial output fifo must be called testserialoutfifo
+The serial input fifo must be called testserialinfifo
+
+these are created with mkfifo from the command line....
+bash> mkfifo testserialinfifo
+bash> mkfifo testserialoutfifo
+
+The way the FIFOs work is the open() call in the program blocks until
+a process opens it from the other side...  
+
+So, you run the program.. then you do 
+cat testserialoutfifo    (which will put out what the program is sending to the STM32)
+and cat > testserialinfifo  (where you can put in data to simulate what the STM32 sends back to the host.)
+
+There's a couple little very simple byte-display utilities: bytesend and byterx.  
+bytesend allows you to send binary to 
+a file by redirection.  This is useful to simulate the target 
+sending stuff back to the host.  Just do ./bytesend > testserialinfifo,
+and put in the values that the STM32 would send.
+
+bytesend used like this keeps the fifo open even when the listening
+process ends and another one picks up.  It closes when you give it a ctrl-D instead of a value
+
+byterx allows you to monitor binary coming back.  This is useful to monitor
+what the bootloader program is actually sending.  Just do 
+cat testserialoutfifo | ./byterx
+
