@@ -317,16 +317,21 @@ if (hostopts.dtrrtsconfigboot_request) {
 	clrrts();		//deassert reset, leave boot0 high
 }
 
+printf("checking autobaudstart\n");
 if (!hostopts.skipautobaud_request) 
 	autobaudstart();		//start communications
 
-
+printf("checking go_request\n");
 if (hostopts.go_request) go_jump();
+printf("checking getcommands_request\n");
 if (hostopts.getcommands_request) get_commands();
+printf("checking getversion_request\n");
 if (hostopts.getversion_request) get_version();
+printf("checking getid_request\n");
 if (hostopts.getid_request) get_id();
 
 
+printf("checking globalerase_request\n");
 if (hostopts.globalerase_request) globalerase_flash(); 
 
 if(hostopts.pageserase_request) pageserase_flash(); 
@@ -340,6 +345,7 @@ if (hostopts.read_request) read_memory();
 
 if (hostopts.test_request) testfunction();
 
+printf("checking dtrrtsconfigboot_request\n");
 if (hostopts.dtrrtsconfigboot_request) {
 	clrdtr();		//pull BOOT0 low (DTR does NOT go thru inverting buffer)
 	setrts();		//pull chips reset line low (RTS goes through inverting buffer)
