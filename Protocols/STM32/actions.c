@@ -761,11 +761,15 @@ int  packet_sendandgetack(Packet * packet, int trycount)
 {
 int packsendtrycount = 0;
 while (1) {
+	unsigned char c;
    packet_send(packet);
-   if (serial_read1byte() == STM32ACK) break;
+   c = serial_read1byte();
+   if (c == STM32ACK) break;
+   printf("packet_sendandgetack: non ack=0x%02x\n", c);
    if (++packsendtrycount >= trycount) 
 	return(1);  
 }
+   printf("packet_sendandgetack: ACK\n");
 return(0);//success if we got ACK
 }
 
