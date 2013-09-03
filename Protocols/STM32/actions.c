@@ -278,6 +278,7 @@ flag hitEOFinloadfile = 0;
 int packsendtrycount;
 int bytestosendthispacket;
 int bytessenttotal = 0;
+unsigned char rxByte;
 
 printf("... starting program_memory()\n");
 address = targopts.start_address;  //starting address
@@ -331,6 +332,7 @@ if (packet_sendandgetack(&outpacket, COMMANDRETRYCOUNT)) {
 	packet_append(&outpacket, ((address & 0x0000ff00) >> 8));
 	packet_append(&outpacket, (address & 0x000000ff));
 	packet_checksumappend(&outpacket);
+	// printf("address packet length=%d check=0x%02x\n", outpacket.length, outpacket.storage[outpacket.length - 1]);
 	packsendtrycount = 0;
 
 
@@ -345,10 +347,12 @@ if (packet_sendandgetack(&outpacket, 1)) {
 	memcpy((outpacket.storage + (size_t) 1),datapacket.storage, bytestosendthispacket);
 	outpacket.length += bytestosendthispacket;
 	packet_checksumappend(&outpacket);
+	// printf("address data length=%d check=0x%02x\n", outpacket.length, outpacket.storage[outpacket.length - 1]);
 
 	packet_send(&outpacket);
-	if (serial_read1byte() != STM32ACK) {
-	   printf("didn't get ack after length,data,checksum in program_memory exiting\n");
+	rxByte = serial_read1byte();
+	if (rxByte != STM32ACK) {
+	   printf("didn't get ack after length,data,checksum in program_memory exiting rxByte=0x%02x\n", rxByte);
 	   exit(1);
 	}
 	bytessenttotal+=bytestosendthispacket;
@@ -769,7 +773,7 @@ while (1) {
    if (++packsendtrycount >= trycount) 
 	return(1);  
 }
-   printf("packet_sendandgetack: ACK\n");
+   // printf("packet_sendandgetack: ACK\n");
 return(0);//success if we got ACK
 }
 
