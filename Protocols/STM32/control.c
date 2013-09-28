@@ -321,8 +321,6 @@ printf("checking autobaudstart\n");
 if (!hostopts.skipautobaud_request) 
 	autobaudstart();		//start communications
 
-printf("checking go_request\n");
-if (hostopts.go_request) go_jump();
 printf("checking getcommands_request\n");
 if (hostopts.getcommands_request) get_commands();
 printf("checking getversion_request\n");
@@ -344,6 +342,9 @@ if (hostopts.program_request) program_memory();
 if (hostopts.read_request) read_memory();
 
 if (hostopts.test_request) testfunction();
+
+printf("checking go_request\n");
+if (hostopts.go_request) go_jump();
 
 printf("checking dtrrtsconfigboot_request\n");
 if (hostopts.dtrrtsconfigboot_request) {
