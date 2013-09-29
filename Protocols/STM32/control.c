@@ -349,6 +349,9 @@ if (hostopts.set_readprotect_request) set_readprotect();
 
 if (hostopts.test_request) testfunction();
 
+printf("checking go_request\n");
+if (hostopts.go_request) go_jump();
+
 printf("checking dtrrtsconfigboot_request\n");
 if (hostopts.dtrrtsconfigboot_request) {
 	clrdtr();		//pull BOOT0 low (DTR does NOT go thru inverting buffer)
