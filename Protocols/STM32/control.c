@@ -321,8 +321,6 @@ printf("checking autobaudstart\n");
 if (!hostopts.skipautobaud_request) 
 	autobaudstart();		//start communications
 
-printf("checking go_request\n");
-if (hostopts.go_request) go_jump();
 printf("checking getcommands_request\n");
 if (hostopts.getcommands_request) get_commands();
 printf("checking getversion_request\n");
@@ -330,18 +328,24 @@ if (hostopts.getversion_request) get_version();
 printf("checking getid_request\n");
 if (hostopts.getid_request) get_id();
 
+printf("checking protect clear requests\n");
+if (hostopts.clear_writeprotect_request) clear_writeprotect();
+if (hostopts.clear_readprotect_request) clear_readprotect();
 
 printf("checking globalerase_request\n");
 if (hostopts.globalerase_request) globalerase_flash(); 
 
+printf("checking pageerase_request\n");
 if(hostopts.pageserase_request) pageserase_flash(); 
 
-if (hostopts.clear_writeprotect_request) clear_writeprotect();
-if (hostopts.set_writeprotect_request) set_writeprotect();
-if (hostopts.clear_readprotect_request) clear_readprotect();
-if (hostopts.set_readprotect_request) set_readprotect();
+printf("checking program_request\n");
 if (hostopts.program_request) program_memory();
+printf("checking read_request\n");
 if (hostopts.read_request) read_memory();
+
+printf("checking protect set requests\n");
+if (hostopts.set_writeprotect_request) set_writeprotect();
+if (hostopts.set_readprotect_request) set_readprotect();
 
 if (hostopts.test_request) testfunction();
 
@@ -352,6 +356,9 @@ if (hostopts.dtrrtsconfigboot_request) {
 	clrrts();		//deassert reset, leave boot0 high
 							//reset brings into normal run mode, jump to 0x08000000
 }
+
+printf("checking go_request\n");
+if (hostopts.go_request) go_jump();
  
 return(0);  //made it through everything ..Yay!
 }   //end main.
